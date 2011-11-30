@@ -10,7 +10,7 @@ Author URI: http://www.jerelabs.com
 Licensed Under: http://creativecommons.org/licenses/by-nc/3.0/
 */
 
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
 
 $jerelabs_ccb_plugin_file = WP_PLUGIN_DIR . '/jerelabs_ccb_groups/jerelabs-ccb-groups-main.php';
 //$plugin_path = plugin_dir_path($jerelabs_ccb_plugin_file);
@@ -155,6 +155,7 @@ function stringToDOMDoc($inputString) {
 
 function shortcodeHandler_form($atts)
 {
+  global $jerelabs_ccb_options;
   $html_output = '';
   $fixedAtts = array_change_key_case($atts,CASE_LOWER);
 
@@ -166,7 +167,7 @@ function shortcodeHandler_form($atts)
 
     $link_baseURL = $jerelabs_ccb_options['ccb_url'] . '/w_form_response.php?form_id=' . $fixedAtts['id'];
     $link_href = 'javascript:void(0)';
-    $link_javascript = "javascript:window.open('".$link_baseURL."','Form','width=735,height=750,resizable=yes,scrollbars=yes');return false;"
+    $link_javascript = "javascript:window.open('".$link_baseURL."','Form','width=735,height=750,resizable=yes,scrollbars=yes');return false;";
 
     if(array_key_exists('text',$fixedAtts))
     {
@@ -177,8 +178,7 @@ function shortcodeHandler_form($atts)
       $link_text = $link_baseURL;
     }
 
-    $html_output = '<a href="' . $link_href . '" onclick="' . $link_javascript . '">' . $link_text . '</a>'
-
+    $html_output = '<a href="' . $link_href . '" onclick="' . $link_javascript . '">' . $link_text . '</a>';
   }
   else
   {
