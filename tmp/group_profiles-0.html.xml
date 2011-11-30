@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ccb_api>
+<request>
+	<parameters>
+		<argument name="srv" value="group_profiles" />
+	</parameters>
+</request>
+<response>
+<service>group_profiles</service>
+<service_action>execute</service_action>
+<availability>public</availability>
+	<groups count="12">
+<group id="1">
+	<name>Entire Church Group</name>
+	<description>Everyone is a part of the church. This is the group for the entire church.</description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="5">Church</group_type>
+	<department></department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=1&amp;tk=939102BA159F102DA8580019B9B51440</calendar_feed>
+	<registration_forms/>
+	<current_members>268</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address type="meeting">
+			<name>Meeting Address</name>
+			<street_address>Meeting Address
+Street</street_address>
+			<city>City</city>
+			<state></state>
+			<zip></zip>
+			<line_1>Meeting Address
+Street</line_1>
+			<line_2>City</line_2>
+		</address>
+	</addresses>
+	<meeting_day></meeting_day>
+	<meeting_time></meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Annoucement Only</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2003-11-26 13:03:43</created>
+	<modified>2011-11-10 23:01:30</modified>
+</group>
+<group id="2">
+	<name>Church Staff</name>
+	<description>The Group for Church Staff.</description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="4">Task / Action</group_type>
+	<department id="6">6-Management Team Leader</department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=2&amp;tk=93910404159F102DA8580019B9B51440</calendar_feed>
+	<registration_forms/>
+	<current_members>1</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day></meeting_day>
+	<meeting_time></meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Invitation or Request Required</membership_type>
+	<user_defined_fields/>
+	<listed>false</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2003-11-26 13:46:43</created>
+	<modified>2011-11-18 17:44:10</modified>
+</group>
+<group id="5">
+	<name>CCB Implementation Team</name>
+	<description>Staff and Volunteers who will be working to set up the different features of the CCB application.</description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="4">Task / Action</group_type>
+	<department id="7">3-Ministry Team Leader</department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=5&amp;tk=939104D6159F102DA8580019B9B51440</calendar_feed>
+	<registration_forms/>
+	<current_members>1</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day></meeting_day>
+	<meeting_time></meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Invitation or Request Required</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2008-02-25 13:52:34</created>
+	<modified>2010-07-27 12:55:10</modified>
+</group>
+<group id="8">
+	<name>Leadership Team</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="2">
+		<first_name>Jeff</first_name>
+		<last_name>Warner</last_name>
+		<full_name>Jeff Warner</full_name>
+		<email>warnerj@mcfweb.org</email>
+		<phones>
+			<phone type="contact">(240) 354-5333</phone>
+		</phones>
+	</main_leader>
+	<leaders>
+		<leader id="1">
+			<first_name>Jeremy</first_name>
+			<last_name>Johnson</last_name>
+			<full_name>Jeremy Johnson</full_name>
+			<email>jeremy@jerelabs.com</email>
+			<phones>
+				<phone type="contact">(301) 442-8561</phone>
+			</phones>
+		</leader>
+	</leaders>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="5">Church</group_type>
+	<department id="6">6-Management Team Leader</department>
+	<area id="8">College Park/Greenbelt</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=8&amp;tk=MN7BMNBA38UVJP5ZJJKB62X4YGUK3YKC</calendar_feed>
+	<registration_forms/>
+	<current_members>4</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day id="1">Varies</meeting_day>
+	<meeting_time id="1">Varies</meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Invitation or Request Required</membership_type>
+	<user_defined_fields/>
+	<listed>false</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-10 21:53:49</created>
+	<modified>2011-11-18 15:30:23</modified>
+</group>
+<group id="10">
+	<name>Spring Break 2012</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="3">Seminar</group_type>
+	<department></department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=10&amp;tk=TQ2VUXDJKP4UMA9RUZR85YDUXQ66E2YU</calendar_feed>
+	<registration_forms>
+		<registration_form id="11">
+			<name>Spring Break 2012 (Deposit)</name>
+			<description>MCF\'s Annual Spring Break trip to Myrtle Beach</description>
+			<url>http://mcfcc.ccbchurch.com/w_form_response.php?form_id=11</url>
+		</registration_form>
+		<registration_form id="15">
+			<name>Spring Break 2011 (Balance Due)</name>
+			<description></description>
+			<url>http://mcfcc.ccbchurch.com/w_form_response.php?form_id=15</url>
+		</registration_form>
+	</registration_forms>
+	<current_members>1</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day></meeting_day>
+	<meeting_time></meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Invitation or Request Required</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-10 23:28:40</created>
+	<modified>2011-11-18 17:24:26</modified>
+</group>
+<group id="11">
+	<name>Fall 2011 - Community Growth Group - Thursday</name>
+	<description>Meets from 7:30 - 8:00pm</description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="69">
+		<first_name>Nadine</first_name>
+		<last_name>Frederique</last_name>
+		<full_name>Nadine Frederique</full_name>
+		<email>nadinepascale@gmail.com</email>
+		<phones>
+			<phone type="contact"></phone>
+		</phones>
+	</main_leader>
+	<leaders>
+		<leader id="1">
+			<first_name>Jeremy</first_name>
+			<last_name>Johnson</last_name>
+			<full_name>Jeremy Johnson</full_name>
+			<email>jeremy@jerelabs.com</email>
+			<phones>
+				<phone type="contact">(301) 442-8561</phone>
+			</phones>
+		</leader>
+	</leaders>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="1">Care / Small Group</group_type>
+	<department></department>
+	<area id="8">College Park/Greenbelt</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=11&amp;tk=VCD26JJEBZUY4BZVTE2NW5XAKJZN6V6Z</calendar_feed>
+	<registration_forms/>
+	<current_members>2</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address type="meeting">
+			<name></name>
+			<street_address>8812 35th Ave</street_address>
+			<city>College Park</city>
+			<state>MD</state>
+			<zip>20740</zip>
+			<line_1>8812 35th Ave</line_1>
+			<line_2>College Park, MD 20740</line_2>
+		</address>
+	</addresses>
+	<meeting_day id="8">Thursday</meeting_day>
+	<meeting_time id="8">Evening</meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>true</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-10 23:55:01</created>
+	<modified>2011-11-25 19:44:34</modified>
+</group>
+<group id="12">
+	<name>Tech Team</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="2">Interest</group_type>
+	<department></department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=12&amp;tk=GU5HUYR56Z8ERMN8MNH36UAQ2D4CK34N</calendar_feed>
+	<registration_forms/>
+	<current_members>5</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day></meeting_day>
+	<meeting_time></meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Invitation or Request Required</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-11 12:11:08</created>
+	<modified>2011-11-20 13:52:16</modified>
+</group>
+<group id="13">
+	<name>Student Group</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="2">
+		<first_name>Jeff</first_name>
+		<last_name>Warner</last_name>
+		<full_name>Jeff Warner</full_name>
+		<email>warnerj@mcfweb.org</email>
+		<phones>
+			<phone type="contact">(240) 354-5333</phone>
+		</phones>
+	</main_leader>
+	<leaders>
+		<leader id="1">
+			<first_name>Jeremy</first_name>
+			<last_name>Johnson</last_name>
+			<full_name>Jeremy Johnson</full_name>
+			<email>jeremy@jerelabs.com</email>
+			<phones>
+				<phone type="contact">(301) 442-8561</phone>
+			</phones>
+		</leader>
+	</leaders>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="5">Church</group_type>
+	<department></department>
+	<area id="13">South Campus</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=13&amp;tk=KQERR592Z946MENKF6B5NUG6USS2BQRF</calendar_feed>
+	<registration_forms/>
+	<current_members>2</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day id="4">Sunday</meeting_day>
+	<meeting_time id="3">Morning</meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Annoucement Only</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-13 08:53:28</created>
+	<modified>2011-11-13 10:00:21</modified>
+</group>
+<group id="14">
+	<name>Community service</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="2">Interest</group_type>
+	<department></department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=14&amp;tk=7ZFRDMAD6PACN4BNRXX462UMT5APUNBF</calendar_feed>
+	<registration_forms/>
+	<current_members>2</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day id="1">Varies</meeting_day>
+	<meeting_time id="1">Varies</meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Annoucement Only</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-13 20:03:24</created>
+	<modified>2011-11-20 13:51:54</modified>
+</group>
+<group id="15">
+	<name>Fall 2011 - Community Growh Group - Wednesday</name>
+	<description>Meets from 7:30 - 8:30pm</description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="214">
+		<first_name>Jim</first_name>
+		<last_name>Thompson</last_name>
+		<full_name>Jim Thompson</full_name>
+		<email>jimyjama@yahoo.com</email>
+		<phones>
+			<phone type="contact"></phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="1">Care / Small Group</group_type>
+	<department></department>
+	<area id="8">College Park/Greenbelt</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=15&amp;tk=7HHW85SEZYH23ENU6H3SRRS6QRGFH84N</calendar_feed>
+	<registration_forms/>
+	<current_members>3</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address type="meeting">
+			<name></name>
+			<street_address>8804 38th Ave</street_address>
+			<city>College Park</city>
+			<state>MD</state>
+			<zip>20740</zip>
+			<line_1>8804 38th Ave</line_1>
+			<line_2>College Park, MD 20740</line_2>
+		</address>
+	</addresses>
+	<meeting_day id="7">Wednesday</meeting_day>
+	<meeting_time id="8">Evening</meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Members Interact</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>true</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-14 08:02:45</created>
+	<modified>2011-11-25 19:41:03</modified>
+</group>
+<group id="16">
+	<name>Life Seminars</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="127">
+		<first_name>Aaron</first_name>
+		<last_name>Lohr</last_name>
+		<full_name>Aaron Lohr</full_name>
+		<email>aaronlohr@yahoo.com</email>
+		<phones>
+			<phone type="contact">(301) 395-4672</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="3">Seminar</group_type>
+	<department></department>
+	<area id="8">College Park/Greenbelt</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=16&amp;tk=9UNC94TAGN3E4Q7X24XDP9UG6UAU8MD7</calendar_feed>
+	<registration_forms/>
+	<current_members>2</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day id="1">Varies</meeting_day>
+	<meeting_time id="1">Varies</meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Annoucement Only</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>true</public_search_listed>
+	<inactive>false</inactive>
+	<creator id="1">Jeremy Johnson</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-14 08:07:55</created>
+	<modified>2011-11-18 15:35:08</modified>
+</group>
+<group id="17">
+	<name>All members of MCF Community Church</name>
+	<description></description>
+	<image>https://cdn.ccbchurch.com/1/images/group-default.gif</image>
+	<campus id="1">MCF Community Church</campus>
+	<main_leader id="1">
+		<first_name>Jeremy</first_name>
+		<last_name>Johnson</last_name>
+		<full_name>Jeremy Johnson</full_name>
+		<email>jeremy@jerelabs.com</email>
+		<phones>
+			<phone type="contact">(301) 442-8561</phone>
+		</phones>
+	</main_leader>
+	<leaders/>
+	<coach/>
+	<director/>
+	<participants/>
+	<group_type id="5">Church</group_type>
+	<department></department>
+	<area id="1">Church</area>
+	<calendar_feed>webcal://mcfcc.ccbchurch.com/group_calendar.ics?id=17&amp;tk=T2BKHKDHSDFJWHD5A2P85M9GAP8EFFMW</calendar_feed>
+	<registration_forms/>
+	<current_members>268</current_members>
+	<group_capacity>Unlimited</group_capacity>
+	<addresses>
+		<address/>
+	</addresses>
+	<meeting_day></meeting_day>
+	<meeting_time></meeting_time>
+	<childcare_provided>false</childcare_provided>
+	<interaction_type>Annoucement Only</interaction_type>
+	<membership_type>Open to All</membership_type>
+	<user_defined_fields/>
+	<listed>true</listed>
+	<public_search_listed>false</public_search_listed>
+	<inactive>false</inactive>
+	<creator>System User</creator>
+	<modifier id="1">Jeremy Johnson</modifier>
+	<created>2011-11-18 14:46:40</created>
+	<modified>2011-11-20 13:54:03</modified>
+</group>
+	</groups>
+</response>
+</ccb_api>
