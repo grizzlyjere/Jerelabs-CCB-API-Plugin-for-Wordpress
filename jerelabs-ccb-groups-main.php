@@ -3,7 +3,7 @@
 Plugin Name: CCB Group List by Jeremy Johnson
 Plugin URI: http://www.jerelabs.com/plugins/ccb-group-list
 Description: CCB Group List by Jeremy Johnson
-Version: 0.2 Alpha
+Version: 0.3 Alpha
 Author: Jeremy Johnson
 Author URI: http://www.jerelabs.com
 
@@ -83,9 +83,19 @@ function debugMessage($msg)
     }
 }
 
+function jerelabs_errorMessage($niceMessage,$uglyMessage = "")
+{
+  echo "<strong>Jerelabs CCB API Plugin Error: </strong>" . $niceMessage ;
+
+  if($uglyMessage<>"")
+    echo " (" . $uglyMessage . ")<BR />";
+  else
+    echo "<BR />";
+}
+
 // Adapted From: http://davidwalsh.name/php-cache-function
 /* gets the contents of a file if it exists, otherwise grabs and caches */
-function get_content($file,$url,$hours = 24,$fn = '',$fn_args = '')
+function jerelabs_get_content($file,$url,$hours = 24,$fn = '',$fn_args = '')
 {
   global $jerelabs_ccb_options;
 
@@ -109,22 +119,58 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
 
   if($content == '')
   { 
-    $content = get_url($url);
-    file_put_contents($outputFile.'.xml',$content);
+    $content = jerelabs_getContentFromURL($url);
+    try {
+      if(file_put_contents($outputFile.'.xml',$content)==FALSE)
+      {
+        jerelabs_errorMessage("Unable to write raw xml file, is tmp directory writeable?","");
+      }
+    } catch (Exception $e) {
+      jerelabs_errorMessage("Unable to write raw xml file, is tmp directory writeable?",$e->getMessage());
+    }
     if($fn) { $content = $fn($content,$fn_args); }
+    
     $content.= '';
-    file_put_contents($outputFile,$content);
-      debugMessage('retrieved fresh from '.$url);
+
+    try {
+      if(file_put_contents($outputFile,$content)==FALSE)
+      {
+        jerelabs_errorMessage("Unable to write formatted cache file, is tmp directory writeable?","");
+      }
+    } catch (Exception $e) {
+      jerelabs_errorMessage("Unable to write formatted cache file, is tmp directory writeable?",$e->getMessage());
+    }
+    
+    debugMessage('retrieved fresh from '.$url);
   }
 
   return $content;
 }
 
 /* gets content from a URL via curl */
-function get_url($url) {
+function jerelabs_getContentFromURL($url) {
   global $jerelabs_ccb_options;
 
-  $ch = curl_init();
+  if($jerelabs_ccb_options['api_username'] == '')
+  {
+    jerelabs_errorMessage("API username is empty","");
+    return "";
+  }
+
+  if($jerelabs_ccb_options['api_password'] == '')
+  {
+    jerelabs_errorMessage("API passwword is empty","");
+    return "";
+  }
+
+  if($url == '')
+  {
+    jerelabs_errorMessage("URL in jerelabs_getContentFromURL is empty","");
+    return "";
+  }
+
+  try {
+    $ch = curl_init();
   curl_setopt($ch,CURLOPT_URL,$url);
   curl_setopt($ch,CURLOPT_RETURNTRANSFER,1); 
   curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5);
@@ -132,25 +178,36 @@ function get_url($url) {
   $content = curl_exec($ch);
   curl_close($ch);
   return $content;
+  } catch (Exception $e) {
+    jerelabs_errorMessage("Failure getting content from API",$e->getMessage());
+  }
 }
 
 
 function fileToDOMDoc($filename) { 
-    $dom= new DOMDocument; 
+    try {
+      $dom= new DOMDocument; 
     $xmldata = file_get_contents($filename); 
     $xmldata = str_replace("&", "&amp;", $xmldata);  // disguise &s going IN to loadXML() 
     $dom->substituteEntities = true;  // collapse &s going OUT to transformToXML() 
     $dom->loadXML($xmldata); 
     return $dom; 
+    } catch (Exception $e) {
+      jerelabs_errorMessage("Error in fileToDOMDoc",$e->getMessage());
+    }
 } 
 
 function stringToDOMDoc($inputString) { 
-    $dom= new DOMDocument; 
+    try {
+      $dom= new DOMDocument; 
     $xmldata = $inputString;
     $xmldata = str_replace("&", "&amp;", $xmldata);  // disguise &s going IN to loadXML() 
     $dom->substituteEntities = true;  // collapse &s going OUT to transformToXML() 
     $dom->loadXML($xmldata); 
     return $dom; 
+    } catch (Exception $e) {
+      jerelabs_errorMessage("Error in stringToDOMDoc",$e->getMessage());
+    }
 } 
 
 function shortcodeHandler_form($atts)
@@ -158,6 +215,18 @@ function shortcodeHandler_form($atts)
   global $jerelabs_ccb_options;
   $html_output = '';
   $fixedAtts = array_change_key_case($atts,CASE_LOWER);
+
+  if($jerelabs_ccb_options['ccb_url'] == '')
+  {
+    jerelabs_errorMessage("CCB URL  is empty","");
+    return "";
+  }
+
+  if($fixedAtts['id'] == '')
+  {
+    jerelabs_errorMessage("CCB-Form ID is empty","");
+    return "";
+  }
 
   if(array_key_exists('id',$fixedAtts))
   {
@@ -183,7 +252,7 @@ function shortcodeHandler_form($atts)
   else
   {
     // ID Missing
-    $html_output = "CCB-FORM Error: Missing ID field";
+    jerelabs_errorMessage("CCB-FORM Error: Missing ID field","");
   }
 
   return $html_output;
@@ -192,9 +261,29 @@ function shortcodeHandler_form($atts)
 
 function shortcodeHandler($atts) {
   //run function that actually does the work of the plugin
+
+    if(!is_array($atts))
+    {
+      jerelabs_errorMessage("Name parameter in shortcode is empty or missing.","");
+      return "";
+    }
+
     $fixedAtts = array_change_key_case($atts,CASE_LOWER);
     debugMessage("Name: " . $fixedAtts['name']);
+
+    if($fixedAtts['name'] == "")
+    {
+      jerelabs_errorMessage("Name parameter in shortcode is empty or missing.","");
+      return "";
+    }
+
     $xslID = findXSLName($fixedAtts['name']);
+
+    if($xslID < 0)
+    {
+      jerelabs_errorMessage("Cannot find definition for '".$fixedAtts['name']."'.  Check the shortcode or the plugin settings.","ID: " . $xslID);
+      return "";
+    }
 
     //Pass additional parameters as API parameters
     $ccbAtts = $atts;
@@ -205,12 +294,25 @@ function shortcodeHandler($atts) {
       if($ccbAtts['date_start']=='today')
         $ccbAtts['date_start'] = date('Y-m-d');
 
+    
+
     if(array_key_exists('num_days',$ccbAtts))
       {
-        $date = date_create(date('Y-m-d'));
-        date_add($date, date_interval_create_from_date_string($ccbAtts['num_days'].' days'));
+        if(!is_numeric($ccbAtts['num_days']))
+        {
+          jerelabs_errorMessage("num_days parameter is not a number","");
+          return "";
+        }
+        try {
+          $date = date_create(date('Y-m-d'));
+        //date_add($date, date_interval_create_from_date_string($ccbAtts['num_days'].' days'));
+        date_modify($date, '+'.$ccbAtts['num_days'].' day');
         $ccbAtts['date_end']=date_format($date, 'Y-m-d');
         unset($ccbAtts['num_days']);
+        } catch (Exception $e) {
+          jerelabs_errorMessage("Unable to calculate end date",$e->getMessage());
+          return "";
+        }
       }
 
     $demolph_output = makeCCBCall($xslID, $ccbAtts);
@@ -221,8 +323,15 @@ function shortcodeHandler($atts) {
 
 function findXSLName($xslName)
 {
+
+  if($xslName == "")
+  {
+    jerelabs_errorMessage("xslName parameter to findXSLName is empty","");
+    return 0;
+  }
+
   global $jerelabs_ccb_xsl_config;
-  $retVal = 0;
+  $retVal = -1;
   for ($i=0; $i<count($jerelabs_ccb_xsl_config);$i++)
   {
     if(strtolower($jerelabs_ccb_xsl_config[$i]['name']) == strtolower($xslName))
@@ -238,6 +347,25 @@ function buildCCBURL($id, $atts)
 {
 	global $jerelabs_ccb_xsl_config;
   global $jerelabs_ccb_options;
+
+  if(!is_numeric($id))
+  {
+    jerelabs_errorMessage("Invalid ID passed to buildCCBURL","");
+    return "";
+  }
+
+  if( $jerelabs_ccb_options['api_url']=="")
+  {
+    jerelabs_errorMessage("API URL is is empty");
+    return "";
+  }
+
+  if($jerelabs_ccb_xsl_config[$id]['srv']=="")
+  {
+    jerelabs_errorMessage("XSL Service Paramater is is empty");
+    return "";
+  }
+
 	$finalURL = $jerelabs_ccb_options['api_url'] . "?srv=" . $jerelabs_ccb_xsl_config[$id]['srv'];
 
   if(count($atts)>0)
@@ -257,13 +385,44 @@ function makeCCBCall($id, $atts)
   global $jerelabs_ccb_options;
   global $jerelabs_ccb_cache_hours;
 
+  if($jerelabs_ccb_xsl_config[$id]['srv']=="")
+  {
+    jerelabs_errorMessage("XSL Service Configuration Option is is empty");
+    return "";
+  }
+
+  if($jerelabs_ccb_xsl_config[$id]['xsl']=="")
+  {
+    jerelabs_errorMessage("XSL Definition Configuration Option is is empty");
+    return "";
+  }
+
+  if(!is_numeric($id))
+  {
+    jerelabs_errorMessage("Invalid ID passed to makeCCBCall","");
+    return "";
+  }
+
   $cacheFileName =  $jerelabs_ccb_xsl_config[$id]['srv'].'-'.$id.'.html';
+  
   $ccbURL = buildCCBURL($id,$atts);
+  
+  if($ccbURL == "")
+    {
+      jerelabs_errorMessage("Error determining CCB URL");
+      return "";
+    }
+
   $xsl = $jerelabs_ccb_xsl_config[$id]['xsl'];
 
   debugMessage("XSL ID: " . $id);
 
-  $html_output = get_content($cacheFileName, $ccbURL,$jerelabs_ccb_cache_hours,'processCCBData',array('file'=>$cacheFileName, 'XSL'=>$xsl));
+  try {
+    $html_output = jerelabs_get_content($cacheFileName, $ccbURL,$jerelabs_ccb_cache_hours,'processCCBData',array('file'=>$cacheFileName, 'XSL'=>$xsl));
+  } catch (Exception $e) {
+    jerelabs_errorMessage("Error retrieving content",$e->getMessage());
+      return "";
+  }
 
 
   return $html_output;
@@ -279,8 +438,38 @@ function processCCBData($content, $args)
   debugMessage("XML: ". strlen($content));
   debugMessage("XSL: ". strlen($args['XSL']));
 
-  $xml = stringToDOMDoc($content); 
-  $xsl = stringToDOMDoc($args['XSL']); 
+  if(strlen($content) < 1)
+  {
+    jerelabs_errorMessage("Error in processCCBData, no XML retrieved.");
+    return "";
+  }
+
+  if(strlen($args['XSL']) < 1)
+  {
+    jerelabs_errorMessage("Error in processCCBData, no XSL specified.");
+    return "";
+  }
+
+  if($jerelabs_ccb_options['ccb_url'] == '')
+  {
+    jerelabs_errorMessage("CCB URL  is empty","");  
+    return "";
+  }
+
+
+  try {
+    $xml = stringToDOMDoc($content); 
+  } catch (Exception $e) {
+    jerelabs_errorMessage("Error converting XML to DOM",$e->getMessage());
+    return "";
+  }
+
+  try {
+    $xsl = stringToDOMDoc($args['XSL']); 
+  } catch (Exception $e) {
+      jerelabs_errorMessage("Error converting XSL to DOM",$e->getMessage());
+      return "";  
+  }
 
   debugMessage("XML: " . gettype($xml));
   debugMessage("XSL: " . gettype($xsl));
@@ -292,7 +481,11 @@ function processCCBData($content, $args)
   $proc->setParameter('','currentDate',date('Y-m-d'));
 
   // transform $xml according to the stylesheet $xsl 
-  $html_output =  $proc->transformToXML($xml); // transform the data 
+  try {
+    $html_output =  $proc->transformToXML($xml); // transform the data 
+  } catch (Exception $e) {
+    jerelabs_errorMessage("Error applying XSL transformation",$e->getMessage());
+  }
 
 
   libxml_clear_errors();
