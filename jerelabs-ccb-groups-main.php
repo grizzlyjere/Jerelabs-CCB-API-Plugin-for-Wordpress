@@ -3,7 +3,7 @@
 Plugin Name: CCB Group List by Jeremy Johnson
 Plugin URI: http://www.jerelabs.com/plugins/ccb-group-list
 Description: CCB Group List by Jeremy Johnson
-Version: 0.3 Alpha
+Version: 0.4 Alpha
 Author: Jeremy Johnson
 Author URI: http://www.jerelabs.com
 
@@ -22,33 +22,36 @@ $jerelabs_ccb_cache_hours = 4;
 add_shortcode("ccb-api", "shortcodeHandler");
 add_shortcode("ccb-form", "shortcodeHandler_Form");
 
-register_activation_hook($jerelabs_ccb_plugin_file, 'jerelabs_ccb_add_defaults_fn');
+register_activation_hook(__FILE__, 'jerelabs_ccb_add_defaults_fn');
 
 function jerelabs_ccb_add_defaults_fn() {
   global $jerelabs_ccb_options;
   global $jerelabs_ccb_xsl_config;
 
+    $plugin_path = plugin_dir_path(__FILE__);
+
   if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_options))) {
-    $arrGeneral = array("ccb_url" => '', "api_url" => '',"api_username" => '', "api_password" => '', "setting_reset" => '', "setting_cache"=>'on',"setting_debug"=>'');
+    $arrGeneral = array("ccb_url" => '', "api_url" => '',"api_username" => '', "api_password" => '', "setting_reset" => '', "setting_cache"=>'off',"setting_debug"=>'');
     update_option('jerelabs_ccb_options', $arrGeneral);
   }
 
   if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    $xsl = file_get_contents(WP_PLUGIN_DIR . '/jerelabs_ccb_groups/group_profile_list.xsl');
+    $xsl_file = $plugin_path . 'group_profile_list.xsl';
+    $xsl = file_get_contents($xsl_file);
     $arrXSL[0] = array("name" => 'SmallGroupList',"srv" => 'group_profiles', "xsl" =>  $xsl);
     update_option('jerelabs_ccb_xsl_config', $arrXSL);
   }
 
 
   if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    $xsl = file_get_contents(WP_PLUGIN_DIR . '/jerelabs_ccb_groups/public_calendar_listing.xsl');
+    $xsl_file = $plugin_path . 'public_calendar_listing.xsl';
+    $xsl = file_get_contents($xsl_file);
     $arrXSL[1] = array("name" => 'CalendarList',"srv" => 'public_calendar_listing', "xsl" =>  $xsl);
     update_option('jerelabs_ccb_xsl_config', $arrXSL);
   }
   
 
   if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    //$xsl = file_get_contents(WP_PLUGIN_DIR . '/jerelabs_ccb_groups/group_profile_list.xsl');
     $xsl = '';
     $arrXSL[2] = array("name" => '',"srv" => '', "xsl" =>  $xsl);
     update_option('jerelabs_ccb_xsl_config', $arrXSL);
@@ -56,7 +59,6 @@ function jerelabs_ccb_add_defaults_fn() {
   
 
   if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    //$xsl = file_get_contents(WP_PLUGIN_DIR . '/jerelabs_ccb_groups/group_profile_list.xsl');
     $xsl = '';
     $arrXSL[3] = array("name" => '',"srv" => '', "xsl" =>  $xsl);
     update_option('jerelabs_ccb_xsl_config', $arrXSL);
@@ -119,7 +121,15 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
 
   if($content == '')
   { 
-    $content = jerelabs_getContentFromURL($url);
+    try
+    {
+      $content = jerelabs_getContentFromURL($url);
+      } catch (Exception $e) {
+      jerelabs_errorMessage("Error retrieving content",$e->getMessage());
+    }
+
+//echo "<h1>jerelabs_getContentFromURL: ". $content . "</h1>";
+
     try {
       if(file_put_contents($outputFile.'.xml',$content)==FALSE)
       {
@@ -128,8 +138,26 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
     } catch (Exception $e) {
       jerelabs_errorMessage("Unable to write raw xml file, is tmp directory writeable?",$e->getMessage());
     }
-    if($fn) { $content = $fn($content,$fn_args); }
-    
+
+    try
+    {
+      $old_content = $content;
+
+      if($fn) { $content = $fn($content,$fn_args); }
+
+      if(strlen($content) == 0)
+      {
+        jerelabs_errorMessage("Error processing CCB response");
+        jerelabs_errorMessage("Response: " . $old_content);   
+        return "";
+      }
+
+    } catch (Exception $e)
+    {
+      jerelabs_errorMessage("Error processing CCB response",$e->getMessage());
+    }
+
+
     $content.= '';
 
     try {
@@ -138,7 +166,7 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
         jerelabs_errorMessage("Unable to write formatted cache file, is tmp directory writeable?","");
       }
     } catch (Exception $e) {
-      jerelabs_errorMessage("Unable to write formatted cache file, is tmp directory writeable?",$e->getMessage());
+      jerelabs_errorMessage("Exception writing catch file.  Unable to write formatted cache file, is tmp directory writeable?",$e->getMessage());
     }
     
     debugMessage('retrieved fresh from '.$url);
