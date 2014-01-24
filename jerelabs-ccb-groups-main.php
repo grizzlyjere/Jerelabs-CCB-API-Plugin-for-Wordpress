@@ -25,7 +25,6 @@ $jerelabs_ccb_cache_hours = 4;
 
 add_action('wp_enqueue_scripts', 'jerelabs_ccb_client_scripts');
 
-add_shortcode("ccb-api", "shortcodeHandler");
 add_shortcode("ccb-form", "shortcodeHandler_Form");
 
 add_shortcode("ccbgroups","shortcodeHandler_Groups");
@@ -99,14 +98,14 @@ function jerelabs_get_content($file,$url,$hours = 24,$fn = '',$fn_args = '')
         }
 
         //TEMPORARY
-$content = file_get_contents('/Applications/MAMP/htdocs/wp-content/plugins/jerelabs-ccb/tmp/group_profile_list.xsl-group_profiles.html.xml');
-$content = $fn($content,$fn_args);
-/*
+        //$content = file_get_contents('/Applications/MAMP/htdocs/wp-content/plugins/jerelabs-ccb/tmp/group_profile_list.xsl-group_profiles.html.xml');
+        //$content = $fn($content,$fn_args);
+
   if($content == '')
   { 
     try
     {
-      //$content = jerelabs_getContentFromURL($url);
+      $content = jerelabs_getContentFromURL($url);
       } catch (Exception $e) {
       jerelabs_errorMessage("Error retrieving content",$e->getMessage());
     }
@@ -154,7 +153,7 @@ $content = $fn($content,$fn_args);
     
     debugMessage('retrieved fresh from '.$url);
   }
-  */
+  
 
   return $content;
 }
@@ -696,25 +695,6 @@ function jerelabs_ccb_admin_init(){
   add_settings_field('setting_Username', 'CCB API Username:', 'renderField_Username', 'jerelabs_ccb', 'section_CCBInfo');
   add_settings_field('setting_Password', 'CCB API Password:', 'renderField_Password', 'jerelabs_ccb', 'section_CCBInfo');
 
-  add_settings_section('section_XSL1', 'XSL Tempate 1', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl1_name','Name:','renderField_xsl1_name','jerelabs_ccb','section_XSL1');
-  add_settings_field('setting_xsl1_srv','Service:','renderField_xsl1_srv','jerelabs_ccb','section_XSL1');
-  add_settings_field('setting_xsl1_xsl','XSL:','renderField_xsl1_xsl','jerelabs_ccb','section_XSL1');
-
-  add_settings_section('section_XSL2', 'XSL Tempate 2', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl2_name','Name:','renderField_xsl2_name','jerelabs_ccb','section_XSL2');
-  add_settings_field('setting_xsl2_srv','Service:','renderField_xsl2_srv','jerelabs_ccb','section_XSL2');
-  add_settings_field('setting_xsl2_xsl','XSL:','renderField_xsl2_xsl','jerelabs_ccb','section_XSL2');
-
-  add_settings_section('section_XSL3', 'XSL Tempate 3', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl3_name','Name:','renderField_xsl3_name','jerelabs_ccb','section_XSL3');
-  add_settings_field('setting_xsl3_srv','Service:','renderField_xsl3_srv','jerelabs_ccb','section_XSL3');
-  add_settings_field('setting_xsl3_xsl','XSL:','renderField_xsl3_xsl','jerelabs_ccb','section_XSL3');
-  
-  add_settings_section('section_XSL4', 'XSL Tempate 4', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl4_name','Name:','renderField_xsl4_name','jerelabs_ccb','section_XSL4');
-  add_settings_field('setting_xsl4_srv','Service:','renderField_xsl4_srv','jerelabs_ccb','section_XSL4');
-  add_settings_field('setting_xsl4_xsl','XSL:','renderField_xsl4_xsl','jerelabs_ccb','section_XSL4');
 
 }
 
@@ -723,95 +703,11 @@ function renderSectionHeading_General()
   echo '<p>Main description of this section here.</p>';
 }
 
-function renderSectionHeading_XSL() {
-  echo '<span class="section_desc">Configure the API call and XSLT used to format the output</span>';
-}
 
 function renderSectionHeadingCCB() {
 echo '<span class="section_desc">Enter the API information from <strong>Settings</strong> | <strong>API</strong> on your CCB website</span>';
 }
 
-
-
-/* XLS 1 */
-
-function renderField_xsl1_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl1_name' name='jerelabs_ccb_xsl_config[0][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[0]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl1_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl1_srv' name='jerelabs_ccb_xsl_config[0][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[0]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl1_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl1_xsl' name='jerelabs_ccb_xsl_config[0][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[0]['xsl']}</textarea>";
-}
-
-/* XLS 2 */
-
-function renderField_xsl2_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl2_name' name='jerelabs_ccb_xsl_config[1][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[1]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl2_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl2_srv' name='jerelabs_ccb_xsl_config[1][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[1]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl2_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl2_xsl' name='jerelabs_ccb_xsl_config[1][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[1]['xsl']}</textarea>";
-}
-
-/* XLS 3 */
-
-function renderField_xsl3_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl3_name' name='jerelabs_ccb_xsl_config[2][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[2]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl3_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl3_srv' name='jerelabs_ccb_xsl_config[2][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[2]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl3_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl3_xsl' name='jerelabs_ccb_xsl_config[2][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[2]['xsl']}</textarea>";
-}
-
-/* XLS 4 */
-
-function renderField_xsl4_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl4_name' name='jerelabs_ccb_xsl_config[3][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[3]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl4_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl4_srv' name='jerelabs_ccb_xsl_config[3][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[3]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl4_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl4_xsl' name='jerelabs_ccb_xsl_config[3][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[3]['xsl']}</textarea>";
-}
 
 /* CCB API */
 

@@ -66,7 +66,7 @@
 <xsl:template match="addresses/address[1]">
         <xsl:value-of select="city"/>
         <xsl:if test="string-length(city) and string-length(state)">
-            <xsl:text> ,</xsl:text>
+            <xsl:text>, </xsl:text>
         </xsl:if>
         <xsl:value-of select="state"/>
 </xsl:template>

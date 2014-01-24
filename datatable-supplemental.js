@@ -46,8 +46,10 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     /* Initialise the DataTable */
     var oTable = $('#ccbgroups').dataTable( {
         "oLanguage": {
-            "sSearch": "Search all columns:"
-        }
+            "sSearch": "Search all columns:" },
+        "aaSorting": [ [0,'asc'], [2,'asc'] ],
+        "iDisplayLength": 10,
+        "sPaginationType": "full_numbers"
     } );
      
     /* Add a select menu for each TH element in the table footer */
