@@ -31,7 +31,7 @@
   </tr>
 </thead>
 <tbody>
-    <xsl:apply-templates select="group[group_type=$group_type or $group_type='*']" />
+    <xsl:apply-templates select="group[(group_type=$group_type or $group_type='*') and public_search_listed='true' and listed='true']" />
   </tbody>
 
 </table>
@@ -55,7 +55,7 @@
 
 	 	<tr>
       <td><xsl:value-of select="group_type" /></td>
-      <td><xsl:value-of select="name" /></td>
+      <td><xsl:value-of disable-output-escaping="yes" select="name" /></td>
       <td><xsl:value-of select="meeting_day" /></td>
       <td><xsl:value-of select="meeting_time" /></td>
       <td><a href="javascript:void(0)"  onclick="javascript:window.open('{$ccburl}/easy_email.php?ax=create_new&individual_id={$leader_id}&group_id={$group_id}&individual_full_name={$leader_fullname}','Email','scrollbars=1,width=520,height=710');return false;"><xsl:value-of select="$leader_displayname"/></a></td>
