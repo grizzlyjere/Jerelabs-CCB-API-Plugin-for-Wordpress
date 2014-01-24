@@ -270,67 +270,6 @@ function shortcodeHandler_form($atts)
 
 }
 
-function shortcodeHandler($atts) {
-  //run function that actually does the work of the plugin
-
-    if(!is_array($atts))
-    {
-      jerelabs_errorMessage("Name parameter in shortcode is empty or missing.","");
-      return "";
-    }
-
-    $fixedAtts = array_change_key_case($atts,CASE_LOWER);
-    debugMessage("Name: " . $fixedAtts['name']);
-
-    if($fixedAtts['name'] == "")
-    {
-      jerelabs_errorMessage("Name parameter in shortcode is empty or missing.","");
-      return "";
-    }
-
-    $xslID = findXSLName($fixedAtts['name']);
-
-    if($xslID < 0)
-    {
-      jerelabs_errorMessage("Cannot find definition for '".$fixedAtts['name']."'.  Check the shortcode or the plugin settings.","ID: " . $xslID);
-      return "";
-    }
-
-    //Pass additional parameters as API parameters
-    $ccbAtts = $atts;
-    unset($ccbAtts['name']);
-
-    //Fix params
-    if(array_key_exists('date_start',$ccbAtts))
-      if($ccbAtts['date_start']=='today')
-        $ccbAtts['date_start'] = date('Y-m-d');
-
-    
-
-    if(array_key_exists('num_days',$ccbAtts))
-      {
-        if(!is_numeric($ccbAtts['num_days']))
-        {
-          jerelabs_errorMessage("num_days parameter is not a number","");
-          return "";
-        }
-        try {
-          $date = date_create(date('Y-m-d'));
-        //date_add($date, date_interval_create_from_date_string($ccbAtts['num_days'].' days'));
-        date_modify($date, '+'.$ccbAtts['num_days'].' day');
-        $ccbAtts['date_end']=date_format($date, 'Y-m-d');
-        unset($ccbAtts['num_days']);
-        } catch (Exception $e) {
-          jerelabs_errorMessage("Unable to calculate end date",$e->getMessage());
-          return "";
-        }
-      }
-
-    $demolph_output = makeCCBCall($xslID, $ccbAtts);
-  
-  //send back text to replace shortcode in post
-  return $demolph_output;
-}
 
 function shortcodeHandler_Groups($atts) {
   // Process groups shortcode
@@ -346,7 +285,7 @@ function shortcodeHandler_Groups($atts) {
    //echo 'Fixed Atts: '.var_dump($fixedAtts).'</BR>';
 
   $ccbAtts = $fixedAtts;
-//echo 'CCB Atts: '.var_dump($ccbAtts).'</BR>';
+  //echo 'CCB Atts: '.var_dump($ccbAtts).'</BR>';
 
   //Check if there is a group type filter
   if(array_key_exists('group_type',$ccbAtts))
@@ -360,7 +299,7 @@ function shortcodeHandler_Groups($atts) {
 
     //echo '<h1>Not if</h1>';
   }
-//echo 'XSL Params: '.var_dump($xslParameters).'</BR>';
+  //echo 'XSL Params: '.var_dump($xslParameters).'</BR>';
 
     //Fix params
 
@@ -394,41 +333,6 @@ function findXSLName($xslName)
   return $retVal;
 }
 
-function buildCCBURL($id, $atts)
-{
-	global $jerelabs_ccb_xsl_config;
-  global $jerelabs_ccb_options;
-
-  if(!is_numeric($id))
-  {
-    jerelabs_errorMessage("Invalid ID passed to buildCCBURL","");
-    return "";
-  }
-
-  if( $jerelabs_ccb_options['api_url']=="")
-  {
-    jerelabs_errorMessage("API URL is is empty");
-    return "";
-  }
-
-  if($jerelabs_ccb_xsl_config[$id]['srv']=="")
-  {
-    jerelabs_errorMessage("XSL Service Paramater is is empty");
-    return "";
-  }
-
-	$finalURL = $jerelabs_ccb_options['api_url'] . "?srv=" . $jerelabs_ccb_xsl_config[$id]['srv'];
-
-  if(count($atts)>0)
-  {
-    foreach($atts as $key => $value)
-    {
-      $finalURL = $finalURL . "&" . $key . "=" . urlencode($value);
-    }
-  
-  }
-	return $finalURL;
-}
 
 function buildCCBURLByService($CCBservice, $atts)
 {
@@ -449,68 +353,19 @@ function buildCCBURLByService($CCBservice, $atts)
 
   $finalURL = $jerelabs_ccb_options['api_url'] . "?srv=" . $CCBservice;
 
-/*
-  if($atts != '' && count($atts)>0)
-  {
-    foreach($atts as $key => $value)
+  /*
+    if($atts != '' && count($atts)>0)
     {
-      $finalURL = $finalURL . "&" . $key . "=" . urlencode($value);
+      foreach($atts as $key => $value)
+      {
+        $finalURL = $finalURL . "&" . $key . "=" . urlencode($value);
+      }
+    
     }
-  
-  }
-  */
+    */
 
   debugMessage($finalURL);
   return $finalURL;
-}
-
-function makeCCBCall($id, $atts)
-{
-  global $jerelabs_ccb_xsl_config;
-  global $jerelabs_ccb_options;
-  global $jerelabs_ccb_cache_hours;
-
-  if($jerelabs_ccb_xsl_config[$id]['srv']=="")
-  {
-    jerelabs_errorMessage("XSL Service Configuration Option is is empty");
-    return "";
-  }
-
-  if($jerelabs_ccb_xsl_config[$id]['xsl']=="")
-  {
-    jerelabs_errorMessage("XSL Definition Configuration Option is is empty");
-    return "";
-  }
-
-  if(!is_numeric($id))
-  {
-    jerelabs_errorMessage("Invalid ID passed to makeCCBCall","");
-    return "";
-  }
-
-  $cacheFileName =  $jerelabs_ccb_xsl_config[$id]['srv'].'-'.$id.'.html';
-  
-  $ccbURL = buildCCBURL($id,$atts);
-  
-  if($ccbURL == "")
-    {
-      jerelabs_errorMessage("Error determining CCB URL");
-      return "";
-    }
-
-  $xsl = $jerelabs_ccb_xsl_config[$id]['xsl'];
-
-  debugMessage("XSL ID: " . $id);
-
-  try {
-    $html_output = jerelabs_get_content($cacheFileName, $ccbURL,$jerelabs_ccb_cache_hours,'processCCBData',array('file'=>$cacheFileName, 'XSL'=>$xsl));
-  } catch (Exception $e) {
-    jerelabs_errorMessage("Error retrieving content",$e->getMessage());
-      return "";
-  }
-
-
-  return $html_output;
 }
 
 function makeCCBCallByFile($xslFileName, $CCBservice, $atts, $xslParameters)
