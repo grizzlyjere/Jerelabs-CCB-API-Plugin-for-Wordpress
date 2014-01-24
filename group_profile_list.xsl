@@ -1,15 +1,18 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:param name="ccburl" select="''"/>
+  
 	<xsl:output method="html" encoding="iso-8859-1" indent="no"/>
+
 
 <!-- Supress nodes we're not matching -->
 <xsl:template match="text()|@*" />
 
  <xsl:template match="groups">
+  <xls:variable name="groupType" select="Growth Groups"/>
 
 <ul>
   
- <xsl:for-each select="group[group_type='Care / Small Group' and public_search_listed='true' and listed='true']">
+ <xsl:for-each select="group[group_type='Growth Groups' and public_search_listed='true' and listed='true']">
  	<xsl:sort data-type="number" order="ascending"
           select="((meeting_day='Monday') * 1) +
           ((meeting_day='Tuesday') * 2) +
