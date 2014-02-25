@@ -28,7 +28,7 @@ add_action('wp_enqueue_scripts', 'jerelabs_ccb_client_scripts');
 add_shortcode("ccb-form", "shortcodeHandler_Form");
 
 add_shortcode("ccbgroups","shortcodeHandler_Groups");
-//add_shortcode("ccb-events","shortcodeHandler_Events")
+add_shortcode("ccbevents","shortcodeHandler_Events");
 
 register_activation_hook(__FILE__, 'jerelabs_ccb_add_defaults_fn');
 
@@ -311,6 +311,65 @@ function shortcodeHandler_Groups($atts) {
   return $fullOutput;
 }
 
+function shortcodeHandler_Events($atts) {
+  // Process groups shortcode
+
+
+    $xslFileName = 'public_calendar_listing.xsl';
+    $CCBservice = 'public_calendar_listing';
+
+
+ 
+  //Pass additional parameters as API parameters  
+  $fixedAtts = array_change_key_case($atts,CASE_LOWER);
+   //echo 'Fixed Atts: '.var_dump($fixedAtts).'</BR>';
+
+  $ccbAtts = $fixedAtts;
+
+//Filter starting today
+  $ccbAtts['date_start'] = date('Y-m-d');
+
+//Check to see how many days
+    if(array_key_exists('num_days',$ccbAtts))
+      {
+        if(!is_numeric($ccbAtts['num_days']))
+        {
+          jerelabs_errorMessage("num_days parameter is not a number","");
+          return "";
+        }
+        
+      }
+      else
+      {
+        // No date count specified.  Default to 7
+        $ccbAtts['num_days'] =7;
+
+      }
+  
+  try {
+          $date = date_create(date('Y-m-d'));
+        //date_add($date, date_interval_create_from_date_string($ccbAtts['num_days'].' days'));
+        date_modify($date, '+'.$ccbAtts['num_days'].' day');
+        $ccbAtts['date_end']=date_format($date, 'Y-m-d');
+        unset($ccbAtts['num_days']);
+        } catch (Exception $e) {
+          jerelabs_errorMessage("Unable to calculate end date",$e->getMessage());
+          return "";
+        }
+
+
+  //echo 'XSL Params: '.var_dump($xslParameters).'</BR>';
+
+    //Fix params
+
+    $fullOutput = makeCCBCallByFile($xslFileName, $CCBservice, $ccbAtts, $xslParameters);
+    //echo var_dump($xslParameters);
+
+    $fullOutput = $fullOutput . '<script src="'. plugins_url('datatable-supplemental.js', __FILE__) .'"'.' />';
+  //send back text to replace shortcode in post
+  return $fullOutput;
+}
+
 function findXSLName($xslName)
 {
 
@@ -353,7 +412,7 @@ function buildCCBURLByService($CCBservice, $atts)
 
   $finalURL = $jerelabs_ccb_options['api_url'] . "?srv=" . $CCBservice;
 
-  /*
+  
     if($atts != '' && count($atts)>0)
     {
       foreach($atts as $key => $value)
@@ -362,7 +421,6 @@ function buildCCBURLByService($CCBservice, $atts)
       }
     
     }
-    */
 
   debugMessage($finalURL);
   return $finalURL;
@@ -492,7 +550,7 @@ function processCCBData($content, $xslParameters)
 // Add client javascripts
 function jerelabs_ccb_client_scripts()
 {
-  echo "<H1>HereIAm</H1>";
+  //echo "<H1>HereIAm</H1>";
 
   wp_register_script( 'jqueryui', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js');
   wp_enqueue_script( 'jquery' );
