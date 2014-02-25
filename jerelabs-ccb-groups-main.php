@@ -3,14 +3,18 @@
 Plugin Name: CCB Group List by Jeremy Johnson
 Plugin URI: http://www.jerelabs.com/plugins/ccb-group-list
 Description: CCB Group List by Jeremy Johnson
-Version: 0.4 Alpha
+Version: 0.5 Alpha
 Author: Jeremy Johnson
 Author URI: http://www.jerelabs.com
 
 Licensed Under: http://creativecommons.org/licenses/by-nc/3.0/
 */
 
-//error_reporting(E_ALL);
+/*
+ini_set('display_errors', 'On');
+error_reporting(E_ALL | E_STRICT);
+define('WP_DEBUG', true);
+*/
 
 $jerelabs_ccb_plugin_file = WP_PLUGIN_DIR . '/jerelabs_ccb_groups/jerelabs-ccb-groups-main.php';
 //$plugin_path = plugin_dir_path($jerelabs_ccb_plugin_file);
@@ -19,8 +23,12 @@ $jerelabs_ccb_options = get_option('jerelabs_ccb_options');
 $jerelabs_ccb_xsl_config = get_option('jerelabs_ccb_xsl_config');
 $jerelabs_ccb_cache_hours = 4;
 
-add_shortcode("ccb-api", "shortcodeHandler");
+add_action('wp_enqueue_scripts', 'jerelabs_ccb_client_scripts');
+
 add_shortcode("ccb-form", "shortcodeHandler_Form");
+
+add_shortcode("ccbgroups","shortcodeHandler_Groups");
+add_shortcode("ccbevents","shortcodeHandler_Events");
 
 register_activation_hook(__FILE__, 'jerelabs_ccb_add_defaults_fn');
 
@@ -33,35 +41,6 @@ function jerelabs_ccb_add_defaults_fn() {
   if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_options))) {
     $arrGeneral = array("ccb_url" => '', "api_url" => '',"api_username" => '', "api_password" => '', "setting_reset" => '', "setting_cache"=>'off',"setting_debug"=>'');
     update_option('jerelabs_ccb_options', $arrGeneral);
-  }
-
-  if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    $xsl_file = $plugin_path . 'group_profile_list.xsl';
-    $xsl = file_get_contents($xsl_file);
-    $arrXSL[0] = array("name" => 'SmallGroupList',"srv" => 'group_profiles', "xsl" =>  $xsl);
-    update_option('jerelabs_ccb_xsl_config', $arrXSL);
-  }
-
-
-  if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    $xsl_file = $plugin_path . 'public_calendar_listing.xsl';
-    $xsl = file_get_contents($xsl_file);
-    $arrXSL[1] = array("name" => 'CalendarList',"srv" => 'public_calendar_listing', "xsl" =>  $xsl);
-    update_option('jerelabs_ccb_xsl_config', $arrXSL);
-  }
-  
-
-  if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    $xsl = '';
-    $arrXSL[2] = array("name" => '',"srv" => '', "xsl" =>  $xsl);
-    update_option('jerelabs_ccb_xsl_config', $arrXSL);
-  }
-  
-
-  if(($jerelabs_ccb_options['setting_reset']=='true')||(!is_array($jerelabs_ccb_xsl_config))) {
-    $xsl = '';
-    $arrXSL[3] = array("name" => '',"srv" => '', "xsl" =>  $xsl);
-    update_option('jerelabs_ccb_xsl_config', $arrXSL);
   }
 }
 
@@ -106,18 +85,21 @@ function jerelabs_get_content($file,$url,$hours = 24,$fn = '',$fn_args = '')
 
   debugMessage($outputFile);
 
-if(array_key_exists('setting_cache',$jerelabs_ccb_options))
-  if(file_exists($outputFile))
-    if($jerelabs_ccb_options['setting_cache'] == 'on')
-      {
-        $current_time = time(); $expire_time = $hours * 60 * 60; $file_time = filemtime($outputFile);  
-        if($current_time - $expire_time < $file_time)
-          {
-            $content = file_get_contents($outputFile);
-              debugMessage('contents cached');
-          }
-      }
+  if(array_key_exists('setting_cache',$jerelabs_ccb_options))
+    if(file_exists($outputFile))
+      if($jerelabs_ccb_options['setting_cache'] == 'on')
+        {
+          $current_time = time(); $expire_time = $hours * 60 * 60; $file_time = filemtime($outputFile);  
+          if($current_time - $expire_time < $file_time)
+            {
+              $content = file_get_contents($outputFile);
+                debugMessage('contents cached');
+            }
+        }
 
+        //TEMPORARY
+        //$content = file_get_contents('/Applications/MAMP/htdocs/wp-content/plugins/jerelabs-ccb/tmp/group_profile_list.xsl-group_profiles.html.xml');
+        //$content = $fn($content,$fn_args);
 
   if($content == '')
   { 
@@ -128,7 +110,6 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
       jerelabs_errorMessage("Error retrieving content",$e->getMessage());
     }
 
-//echo "<h1>jerelabs_getContentFromURL: ". $content . "</h1>";
 
     try {
       if(file_put_contents($outputFile.'.xml',$content)==FALSE)
@@ -143,6 +124,7 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
     {
       $old_content = $content;
 
+      // Parse CCB Data
       if($fn) { $content = $fn($content,$fn_args); }
 
       if(strlen($content) == 0)
@@ -171,6 +153,7 @@ if(array_key_exists('setting_cache',$jerelabs_ccb_options))
     
     debugMessage('retrieved fresh from '.$url);
   }
+  
 
   return $content;
 }
@@ -287,43 +270,66 @@ function shortcodeHandler_form($atts)
 
 }
 
-function shortcodeHandler($atts) {
-  //run function that actually does the work of the plugin
 
-    if(!is_array($atts))
-    {
-      jerelabs_errorMessage("Name parameter in shortcode is empty or missing.","");
-      return "";
-    }
+function shortcodeHandler_Groups($atts) {
+  // Process groups shortcode
 
-    $fixedAtts = array_change_key_case($atts,CASE_LOWER);
-    debugMessage("Name: " . $fixedAtts['name']);
 
-    if($fixedAtts['name'] == "")
-    {
-      jerelabs_errorMessage("Name parameter in shortcode is empty or missing.","");
-      return "";
-    }
+    $xslFileName = 'group_profile_list_simple.xsl';
+    $CCBservice = 'group_profiles';
 
-    $xslID = findXSLName($fixedAtts['name']);
 
-    if($xslID < 0)
-    {
-      jerelabs_errorMessage("Cannot find definition for '".$fixedAtts['name']."'.  Check the shortcode or the plugin settings.","ID: " . $xslID);
-      return "";
-    }
+ 
+  //Pass additional parameters as API parameters  
+  $fixedAtts = array_change_key_case($atts,CASE_LOWER);
+   //echo 'Fixed Atts: '.var_dump($fixedAtts).'</BR>';
 
-    //Pass additional parameters as API parameters
-    $ccbAtts = $atts;
-    unset($ccbAtts['name']);
+  $ccbAtts = $fixedAtts;
+  //echo 'CCB Atts: '.var_dump($ccbAtts).'</BR>';
+
+  //Check if there is a group type filter
+  if(array_key_exists('group_type',$ccbAtts))
+  {
+    //echo 'IN IF';
+    $xslParameters['group_type'] = $ccbAtts['group_type'];
+    unset($ccbAtts['group_type']);
+  }
+  else
+  {
+
+    //echo '<h1>Not if</h1>';
+  }
+  //echo 'XSL Params: '.var_dump($xslParameters).'</BR>';
 
     //Fix params
-    if(array_key_exists('date_start',$ccbAtts))
-      if($ccbAtts['date_start']=='today')
-        $ccbAtts['date_start'] = date('Y-m-d');
 
-    
+    $fullOutput = makeCCBCallByFile($xslFileName, $CCBservice, $ccbAtts, $xslParameters);
+    //echo var_dump($xslParameters);
 
+    $fullOutput = $fullOutput . '<script src="'. plugins_url('datatable-supplemental.js', __FILE__) .'"'.' />';
+  //send back text to replace shortcode in post
+  return $fullOutput;
+}
+
+function shortcodeHandler_Events($atts) {
+  // Process groups shortcode
+
+
+    $xslFileName = 'public_calendar_listing.xsl';
+    $CCBservice = 'public_calendar_listing';
+
+
+ 
+  //Pass additional parameters as API parameters  
+  $fixedAtts = array_change_key_case($atts,CASE_LOWER);
+   //echo 'Fixed Atts: '.var_dump($fixedAtts).'</BR>';
+
+  $ccbAtts = $fixedAtts;
+
+//Filter starting today
+  $ccbAtts['date_start'] = date('Y-m-d');
+
+//Check to see how many days
     if(array_key_exists('num_days',$ccbAtts))
       {
         if(!is_numeric($ccbAtts['num_days']))
@@ -331,7 +337,16 @@ function shortcodeHandler($atts) {
           jerelabs_errorMessage("num_days parameter is not a number","");
           return "";
         }
-        try {
+        
+      }
+      else
+      {
+        // No date count specified.  Default to 7
+        $ccbAtts['num_days'] =7;
+
+      }
+  
+  try {
           $date = date_create(date('Y-m-d'));
         //date_add($date, date_interval_create_from_date_string($ccbAtts['num_days'].' days'));
         date_modify($date, '+'.$ccbAtts['num_days'].' day');
@@ -341,12 +356,18 @@ function shortcodeHandler($atts) {
           jerelabs_errorMessage("Unable to calculate end date",$e->getMessage());
           return "";
         }
-      }
 
-    $demolph_output = makeCCBCall($xslID, $ccbAtts);
-  
+
+  //echo 'XSL Params: '.var_dump($xslParameters).'</BR>';
+
+    //Fix params
+
+    $fullOutput = makeCCBCallByFile($xslFileName, $CCBservice, $ccbAtts, $xslParameters);
+    //echo var_dump($xslParameters);
+
+    $fullOutput = $fullOutput . '<script src="'. plugins_url('datatable-supplemental.js', __FILE__) .'"'.' />';
   //send back text to replace shortcode in post
-  return $demolph_output;
+  return $fullOutput;
 }
 
 function findXSLName($xslName)
@@ -371,14 +392,15 @@ function findXSLName($xslName)
   return $retVal;
 }
 
-function buildCCBURL($id, $atts)
+
+function buildCCBURLByService($CCBservice, $atts)
 {
-	global $jerelabs_ccb_xsl_config;
+  global $jerelabs_ccb_xsl_config;
   global $jerelabs_ccb_options;
 
-  if(!is_numeric($id))
+  if($CCBservice == '')
   {
-    jerelabs_errorMessage("Invalid ID passed to buildCCBURL","");
+    jerelabs_errorMessage("CCB Service not specified","");
     return "";
   }
 
@@ -388,52 +410,45 @@ function buildCCBURL($id, $atts)
     return "";
   }
 
-  if($jerelabs_ccb_xsl_config[$id]['srv']=="")
-  {
-    jerelabs_errorMessage("XSL Service Paramater is is empty");
-    return "";
-  }
+  $finalURL = $jerelabs_ccb_options['api_url'] . "?srv=" . $CCBservice;
 
-	$finalURL = $jerelabs_ccb_options['api_url'] . "?srv=" . $jerelabs_ccb_xsl_config[$id]['srv'];
-
-  if(count($atts)>0)
-  {
-    foreach($atts as $key => $value)
-    {
-      $finalURL = $finalURL . "&" . $key . "=" . urlencode($value);
-    }
   
-  }
-	return $finalURL;
+    if($atts != '' && count($atts)>0)
+    {
+      foreach($atts as $key => $value)
+      {
+        $finalURL = $finalURL . "&" . $key . "=" . urlencode($value);
+      }
+    
+    }
+
+  debugMessage($finalURL);
+  return $finalURL;
 }
 
-function makeCCBCall($id, $atts)
+function makeCCBCallByFile($xslFileName, $CCBservice, $atts, $xslParameters)
 {
   global $jerelabs_ccb_xsl_config;
   global $jerelabs_ccb_options;
   global $jerelabs_ccb_cache_hours;
 
-  if($jerelabs_ccb_xsl_config[$id]['srv']=="")
+  if($xslFileName == '')
   {
-    jerelabs_errorMessage("XSL Service Configuration Option is is empty");
+    jerelabs_errorMessage("XSL File Name not specified");
     return "";
   }
 
-  if($jerelabs_ccb_xsl_config[$id]['xsl']=="")
+  if($CCBservice == '')
   {
-    jerelabs_errorMessage("XSL Definition Configuration Option is is empty");
+    jerelabs_errorMessage("CCB Service not specified");
     return "";
   }
 
-  if(!is_numeric($id))
-  {
-    jerelabs_errorMessage("Invalid ID passed to makeCCBCall","");
-    return "";
-  }
 
-  $cacheFileName =  $jerelabs_ccb_xsl_config[$id]['srv'].'-'.$id.'.html';
+
+  $cacheFileName =  $xslFileName.'-'.$CCBservice.'.html';
   
-  $ccbURL = buildCCBURL($id,$atts);
+  $ccbURL = buildCCBURLByService($CCBservice,$atts);
   
   if($ccbURL == "")
     {
@@ -441,12 +456,16 @@ function makeCCBCall($id, $atts)
       return "";
     }
 
-  $xsl = $jerelabs_ccb_xsl_config[$id]['xsl'];
+  $fullXSLPath = dirname( __FILE__ ) . '/' . $xslFileName;
 
-  debugMessage("XSL ID: " . $id);
+  $xsl = file_get_contents($fullXSLPath);
+
+  $xslParameters['file'] = $cacheFileName;
+  $xslParameters['XSL'] = $xsl;
+
 
   try {
-    $html_output = jerelabs_get_content($cacheFileName, $ccbURL,$jerelabs_ccb_cache_hours,'processCCBData',array('file'=>$cacheFileName, 'XSL'=>$xsl));
+    $html_output = jerelabs_get_content($cacheFileName, $ccbURL,$jerelabs_ccb_cache_hours,'processCCBData',$xslParameters);
   } catch (Exception $e) {
     jerelabs_errorMessage("Error retrieving content",$e->getMessage());
       return "";
@@ -456,7 +475,7 @@ function makeCCBCall($id, $atts)
   return $html_output;
 }
 
-function processCCBData($content, $args)
+function processCCBData($content, $xslParameters)
 {
   $html_output = '';
   global $jerelabs_ccb_options;
@@ -464,7 +483,7 @@ function processCCBData($content, $args)
   $use_errors = libxml_use_internal_errors(true);
 
   debugMessage("XML: ". strlen($content));
-  debugMessage("XSL: ". strlen($args['XSL']));
+  debugMessage("XSL: ". strlen($xslParameters['XSL']));
 
   if(strlen($content) < 1)
   {
@@ -472,7 +491,7 @@ function processCCBData($content, $args)
     return "";
   }
 
-  if(strlen($args['XSL']) < 1)
+  if(strlen($xslParameters['XSL']) < 1)
   {
     jerelabs_errorMessage("Error in processCCBData, no XSL specified.");
     return "";
@@ -493,7 +512,7 @@ function processCCBData($content, $args)
   }
 
   try {
-    $xsl = stringToDOMDoc($args['XSL']); 
+    $xsl = stringToDOMDoc($xslParameters['XSL']); 
   } catch (Exception $e) {
       jerelabs_errorMessage("Error converting XSL to DOM",$e->getMessage());
       return "";  
@@ -506,6 +525,11 @@ function processCCBData($content, $args)
   $proc = new XSLTProcessor; 
   $proc->importStyleSheet($xsl);
   $proc->setParameter('','ccburl',$jerelabs_ccb_options['ccb_url']);
+  if(strlen($xslParameters['group_type'])>0)
+    {
+      $proc->setParameter('','group_type',$xslParameters['group_type']);
+      debugMessage('Set Group Type:' . $xslParameters['group_type']);
+    }
   $proc->setParameter('','currentDate',date('Y-m-d'));
 
   // transform $xml according to the stylesheet $xsl 
@@ -522,6 +546,26 @@ function processCCBData($content, $args)
 
   return $html_output;
 }
+
+// Add client javascripts
+function jerelabs_ccb_client_scripts()
+{
+  //echo "<H1>HereIAm</H1>";
+
+  wp_register_script( 'jqueryui', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js');
+  wp_enqueue_script( 'jquery' );
+  
+
+  wp_register_script('datatable','http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js','jquery','1.9.4',true);
+  wp_enqueue_script('datatable');
+  
+
+  wp_register_style( 'datatablesCSS', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css');
+  wp_enqueue_style( 'datatablesCSS' );
+
+}
+
+
 // add the admin options page
 add_action('admin_menu', 'jerelabs_ccb_admin_add_page');
 function jerelabs_ccb_admin_add_page() {
@@ -564,25 +608,6 @@ function jerelabs_ccb_admin_init(){
   add_settings_field('setting_Username', 'CCB API Username:', 'renderField_Username', 'jerelabs_ccb', 'section_CCBInfo');
   add_settings_field('setting_Password', 'CCB API Password:', 'renderField_Password', 'jerelabs_ccb', 'section_CCBInfo');
 
-  add_settings_section('section_XSL1', 'XSL Tempate 1', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl1_name','Name:','renderField_xsl1_name','jerelabs_ccb','section_XSL1');
-  add_settings_field('setting_xsl1_srv','Service:','renderField_xsl1_srv','jerelabs_ccb','section_XSL1');
-  add_settings_field('setting_xsl1_xsl','XSL:','renderField_xsl1_xsl','jerelabs_ccb','section_XSL1');
-
-  add_settings_section('section_XSL2', 'XSL Tempate 2', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl2_name','Name:','renderField_xsl2_name','jerelabs_ccb','section_XSL2');
-  add_settings_field('setting_xsl2_srv','Service:','renderField_xsl2_srv','jerelabs_ccb','section_XSL2');
-  add_settings_field('setting_xsl2_xsl','XSL:','renderField_xsl2_xsl','jerelabs_ccb','section_XSL2');
-
-  add_settings_section('section_XSL3', 'XSL Tempate 3', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl3_name','Name:','renderField_xsl3_name','jerelabs_ccb','section_XSL3');
-  add_settings_field('setting_xsl3_srv','Service:','renderField_xsl3_srv','jerelabs_ccb','section_XSL3');
-  add_settings_field('setting_xsl3_xsl','XSL:','renderField_xsl3_xsl','jerelabs_ccb','section_XSL3');
-  
-  add_settings_section('section_XSL4', 'XSL Tempate 4', 'renderSectionHeading_XSL', 'jerelabs_ccb');
-  add_settings_field('setting_xsl4_name','Name:','renderField_xsl4_name','jerelabs_ccb','section_XSL4');
-  add_settings_field('setting_xsl4_srv','Service:','renderField_xsl4_srv','jerelabs_ccb','section_XSL4');
-  add_settings_field('setting_xsl4_xsl','XSL:','renderField_xsl4_xsl','jerelabs_ccb','section_XSL4');
 
 }
 
@@ -591,95 +616,11 @@ function renderSectionHeading_General()
   echo '<p>Main description of this section here.</p>';
 }
 
-function renderSectionHeading_XSL() {
-  echo '<span class="section_desc">Configure the API call and XSLT used to format the output</span>';
-}
 
 function renderSectionHeadingCCB() {
 echo '<span class="section_desc">Enter the API information from <strong>Settings</strong> | <strong>API</strong> on your CCB website</span>';
 }
 
-
-
-/* XLS 1 */
-
-function renderField_xsl1_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl1_name' name='jerelabs_ccb_xsl_config[0][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[0]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl1_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl1_srv' name='jerelabs_ccb_xsl_config[0][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[0]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl1_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl1_xsl' name='jerelabs_ccb_xsl_config[0][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[0]['xsl']}</textarea>";
-}
-
-/* XLS 2 */
-
-function renderField_xsl2_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl2_name' name='jerelabs_ccb_xsl_config[1][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[1]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl2_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl2_srv' name='jerelabs_ccb_xsl_config[1][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[1]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl2_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl2_xsl' name='jerelabs_ccb_xsl_config[1][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[1]['xsl']}</textarea>";
-}
-
-/* XLS 3 */
-
-function renderField_xsl3_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl3_name' name='jerelabs_ccb_xsl_config[2][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[2]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl3_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl3_srv' name='jerelabs_ccb_xsl_config[2][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[2]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl3_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl3_xsl' name='jerelabs_ccb_xsl_config[2][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[2]['xsl']}</textarea>";
-}
-
-/* XLS 4 */
-
-function renderField_xsl4_name()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl4_name' name='jerelabs_ccb_xsl_config[3][name]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[3]['name']}'><br />A name used to reference this in your post.  Eg. [ccb-api name='NAME']";
-  
-}
-
-function renderField_xsl4_srv(){
-  global $jerelabs_ccb_xsl_config;
-  echo "<input id='setting_xsl4_srv' name='jerelabs_ccb_xsl_config[3][srv]' size='40' type='text' value='{$jerelabs_ccb_xsl_config[3]['srv']}'><br />Name of the CCB API service.";
-}
-
-function renderField_xsl4_xsl()
-{
-  global $jerelabs_ccb_xsl_config;
-  echo "<textarea id='setting_xsl4_xsl' name='jerelabs_ccb_xsl_config[3][xsl]' rows=15 cols=80>{$jerelabs_ccb_xsl_config[3]['xsl']}</textarea>";
-}
 
 /* CCB API */
 
