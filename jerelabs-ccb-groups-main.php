@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: CCB Group List by Jeremy Johnson
+Plugin Name: Jerelabs CCB API for Workpress
 Plugin URI: http://www.jerelabs.com/plugins/ccb-group-list
-Description: CCB Group List by Jeremy Johnson
-Version: 0.5 Alpha
+Description: This plugin utilizes the API to display group or event data within wordpress.  This is a very early development version so features are limited.
+Version: 0.5 Alpha 2
 Author: Jeremy Johnson
 Author URI: http://www.jerelabs.com
 
