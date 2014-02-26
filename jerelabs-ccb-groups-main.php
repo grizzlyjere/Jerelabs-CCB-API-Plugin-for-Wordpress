@@ -299,6 +299,28 @@ function shortcodeHandler_Groups($atts) {
 
     //echo '<h1>Not if</h1>';
   }
+
+  // Check if a format has been specified
+  if(array_key_exists('format',$ccbAtts))
+  {
+
+    if($ccbAtts['format']=='bullet')
+    {
+      $xslFileName = 'group_profile_list.xsl';
+    }
+    elseif($ccbAtts['format']=='grid')
+    {
+      $xslFileName = 'group_profile_list_simple.xsl';
+    }
+
+    unset($ccbAtts['format']);
+  }
+  else
+  {
+
+    //echo '<h1>Not if</h1>';
+  }
+
   //echo 'XSL Params: '.var_dump($xslParameters).'</BR>';
 
     //Fix params
